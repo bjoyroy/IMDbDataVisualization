@@ -3,6 +3,7 @@
     var starYear = 1930;
     var year = 2018;
     var moviesByYearGenre;
+    var numberOfMoviesInBar = 5;
 
     // design specific global variables
     var width = 1300
@@ -64,6 +65,9 @@
 
         var index = 0;
 
+        var maxVote = 0;
+        var minVote = Infinity;
+
         Array.from(genreMovies.keys()).sort().forEach(function (genre) {
 
             var movies = genreMovies.get(genre);
@@ -72,16 +76,30 @@
                 var rating1 = +(m1.averageRating);
                 var rating2 = +(m2.averageRating);
                 return rating2 - rating1;
-            })
+            });
+
+            var topMovies = movies.slice(0, numberOfMoviesInBar);
+
+            maxVote = topMovies.reduce((acc, item) => {
+                return Math.max(acc, +(item.numVotes));
+            }, maxVote);
+
+
+            minVote = topMovies.reduce((acc, item) => {
+                return Math.min(acc, +(item.numVotes));
+            }, minVote);
+
+
+
 
             //console.log(movies.slice(0, 10));
             var obj = {
                 "name" : genre,
-                "children": movies.slice(0, 5).map(function (m) {
+                "children": topMovies.map(function (m) {
                     return {
                         "name" : m.primaryTitle,
                         "rating" : m.averageRating,
-                        "votes" : m.numVotes,
+                        "votes" : +(m.numVotes),
                         "tconst": m.tconst
                     }
                 } )
@@ -89,6 +107,13 @@
 
             children.push(obj);
         });
+
+        var colorScale = d3.scaleLinear()
+            .domain([minVote, maxVote])
+            .range("white", "blue");
+
+
+        //console.log(mostVotedMovie);
 
         var dendogramData = {
             "name": year,
@@ -175,7 +200,11 @@
 
         leafNodeG.append("rect")
             .attr("class","shadow")
-            .style("fill", function (d) {return "gray"})
+            .style("fill", function (d) {
+                console.log(d.data.votes);
+                var value = d.data.votes / maxVote; // normalizing
+                return d3.interpolateYlGnBu(value);
+            })
             .attr("height", 25)
             .attr("rx", 2)
             .attr("ry", 2)
@@ -196,7 +225,9 @@
             .style("text-anchor", "start")
             .text(function (d) {
                 return d.data.name;
-            });
+            })
+            .attr("font-weight", "bold")
+            .style("fill", "#b84774");
 
         /*
         leafNodeG.append("text")
@@ -238,10 +269,6 @@
             .attr("class","xAxis")
             .attr("transform", "translate(" + 10 + "," + -9 + ")")
             .call(xAxis);
-
-
-
-
 
 
     }
