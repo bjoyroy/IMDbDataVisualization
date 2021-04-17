@@ -4,14 +4,15 @@
     var year = 2018;
     var moviesByYearGenre;
     var numberOfMoviesInBar = 5;
+    var movieRatingBarHeight = 25;
 
     // design specific global variables
     var width = 1300
-    var height = 2500
+    var height = 3000
     var nodeRadius = 3;
 
     // svg global variables
-    var svg, g;
+    var svg, g, votesDiv;
 
     d3.tsv(movie_tsv_file).then(function (movies) {
         movies = movies.filter(function (d) {
@@ -37,7 +38,7 @@
     d3.select("#yearSlider")
         .on("change", function () {
             year = +(d3.select(this).property('value'));
-            console.log(year);
+            //console.log(year);
 
             d3.select("#yearText").text(year);
             createDendrogram(moviesByYearGenre.get(year), year);
@@ -51,11 +52,16 @@
             .attr("height", height)
             //.attr("viewBox", [0, 0, 400, 500])
             .append("g")
-            .attr("transform", "translate(40,0)");  // bit of margin on the left = 40
+            .attr("transform", "translate(40,20)");  // bit of margin on the left = 40
 
         g = svg.append("g")
             .attr("class", "dendro-g")
             .attr("transform", "translate(5,5)");
+
+        votesDiv = d3.select("#my_dataviz")
+            .append("div")
+            .attr("id", "legend1")
+            .attr("class", "legend1");
     }
 
 
@@ -112,6 +118,9 @@
             .domain([minVote, maxVote])
             .range("white", "blue");
 
+        var mostVoteColorScale = d3.scaleSequential(d3.interpolateYlGn)
+            .domain([minVote, maxVote]);
+
 
         //console.log(mostVotedMovie);
 
@@ -124,14 +133,13 @@
 
 
         var cluster = d3.cluster()
-            .size([height, width - 500]);  // 450 is the margin I will have on the right side
+            .size([height, width - 500]);  // 500 is the margin I will have on the right side
 
         // Give the data to this cluster layout:
         var root = d3.hierarchy(dendogramData, function(d) {
             return d.children;
         });
 
-        //console.log(root.descendants());
 
         cluster(root);
 
@@ -190,7 +198,7 @@
             .attr("transform", "translate(" + 8 + "," + -10 + ")");
 
         var xScale =  d3.scaleLinear()
-            .domain([3, 10.0])
+            .domain([2.5, 10.0])
             .range([0, 450]);
 
         var xAxis = d3.axisTop()
@@ -201,18 +209,39 @@
         leafNodeG.append("rect")
             .attr("class","shadow")
             .style("fill", function (d) {
-                console.log(d.data.votes);
+                //console.log(d.data.votes);
                 var value = d.data.votes / maxVote; // normalizing
-                return d3.interpolateYlGnBu(value);
+                return mostVoteColorScale(d.data.votes);
+                //return d3.interpolateYlGn(value);
             })
-            .attr("height", 25)
-            .attr("rx", 2)
-            .attr("ry", 2)
+            .attr("height", movieRatingBarHeight)
+            //.attr("rx", 2)
+            //.attr("ry", 2)
+            //.attr("stroke", "black")
+            //.attr("stroke-width", "0.5px")
             .transition()
             .duration(300)
             .attr("width", function (d) {
                 return xScale(d.data.rating);
             });
+
+
+        leafNodeG.append("line")
+            .attr("class", "right-line")
+            .attr("x1", function (d) {
+                return xScale(d.data.rating);
+            })
+            .attr("y1", 0)
+            .attr("x2", function (d) {
+                return xScale(d.data.rating);
+            })
+            .attr("y2", movieRatingBarHeight)
+            .style("stroke", "black")
+            .style("stroke-dasharray", ("2, 3"));
+
+
+
+
 
         leafNodeG.append("svg:a")
             .attr("xlink:href", function(d){
@@ -229,16 +258,6 @@
             .attr("font-weight", "bold")
             .style("fill", "#b84774");
 
-        /*
-        leafNodeG.append("text")
-            .attr("dy", 19.5)
-            .attr("x", 8)
-            .style("text-anchor", "start")
-            .text(function (d) {
-                return d.data.name;
-            });
-
-         */
 
         // Write down text for every parent datum
         var internalNode = g.selectAll(".node--internal");
@@ -251,7 +270,9 @@
             .style("text-anchor", "middle")
             .text(function (d) {
                 return d.data.name;
-            });
+            })
+            .attr("font-weight", "bold")
+            .attr("font-size", "1.5em");
 
 
         // x-scale and x-axis
@@ -267,9 +288,78 @@
 
         firstEndNode.insert("g")
             .attr("class","xAxis")
-            .attr("transform", "translate(" + 10 + "," + -9 + ")")
+            .attr("transform", "translate(" + 10 + "," + -15 + ")")
             .call(xAxis);
+
+        continuous("#legend1", mostVoteColorScale);
 
 
     }
+
+    // create continuous color legend
+    function continuous(selector_id, colorscale) {
+        var legendheight = 400,
+            legendwidth = 80,
+            margin = {top: 10, right: 60, bottom: 10, left: 2};
+
+        var canvas = d3.select(selector_id)
+            .style("height", legendheight + "px")
+            .style("width", legendwidth + "px")
+            //.style("position", "relative")
+            .append("canvas")
+            .attr("height", legendheight - margin.top - margin.bottom)
+            .attr("width", 1)
+            .style("height", (legendheight - margin.top - margin.bottom) + "px")
+            .style("width", (legendwidth - margin.left - margin.right) + "px")
+            .style("border", "1px solid #000")
+            .style("position", "absolute")
+            .style("top", (margin.top) + "px")
+            .style("left", (margin.left) + "px")
+            .node();
+
+        var ctx = canvas.getContext("2d");
+
+        var legendscale = d3.scaleLinear()
+            .range([1, legendheight - margin.top - margin.bottom])
+            .domain(colorscale.domain());
+
+        // image data hackery based on http://bl.ocks.org/mbostock/048d21cf747371b11884f75ad896e5a5
+        var image = ctx.createImageData(1, legendheight);
+        d3.range(legendheight).forEach(function(i) {
+            var c = d3.rgb(colorscale(legendscale.invert(i)));
+            image.data[4*i] = c.r;
+            image.data[4*i + 1] = c.g;
+            image.data[4*i + 2] = c.b;
+            image.data[4*i + 3] = 255;
+        });
+        ctx.putImageData(image, 0, 0);
+
+        // A simpler way to do the above, but possibly slower. keep in mind the legend width is stretched because the width attr of the canvas is 1
+        // See http://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
+        /*
+        d3.range(legendheight).forEach(function(i) {
+          ctx.fillStyle = colorscale(legendscale.invert(i));
+          ctx.fillRect(0,i,1,1);
+        });
+        */
+
+        var legendaxis = d3.axisRight()
+            .scale(legendscale)
+            .tickSize(6)
+            .ticks(8);
+
+        var svg = d3.select(selector_id)
+            .append("svg")
+            .attr("height", (legendheight) + "px")
+            .attr("width", (legendwidth) + "px")
+            .style("position", "absolute")
+            .style("left", "0px")
+            .style("top", "0px")
+
+        svg
+            .append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
+            .call(legendaxis);
+    };
 })();
