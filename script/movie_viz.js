@@ -5,17 +5,21 @@
     var moviesByYearGenre;
 
     // design specific global variables
-    var width = 1000
-    var height = 1000
+    var width = 1300
+    var height = 2500
     var nodeRadius = 3;
 
     // svg global variables
     var svg, g;
 
     d3.tsv(movie_tsv_file).then(function (movies) {
+        movies = movies.filter(function (d) {
+            return d.genres != "\\N";
+        });
+
         year = +(d3.select("#yearSlider").property('value'));
 
-        console.log(year);
+        console.log(movies);
 
         var sMovies = movies.filter(function (d) {
             var year = +(d.startYear);
@@ -38,22 +42,13 @@
             createDendrogram(moviesByYearGenre.get(year), year);
         })
 
-    /*
-    d3.select("#year_select")
-        .on('change', function () {
-            var year = +(d3.select(this).property('value'));
-            console.log(year);
-            createDendrogram(moviesByYearGenre.get(year), year);
-        });
-
-     */
-
     function setupSVG() {
         // append the svg object to the body of the page
         svg = d3.select("#my_dataviz")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
+            //.attr("viewBox", [0, 0, 400, 500])
             .append("g")
             .attr("transform", "translate(40,0)");  // bit of margin on the left = 40
 
@@ -69,15 +64,7 @@
 
         var index = 0;
 
-        Array.from(genreMovies.keys()).forEach(function (genre) {
-            /*
-            if(index < 3){
-                index++;
-            } else {
-                return;
-            }
-
-             */
+        Array.from(genreMovies.keys()).sort().forEach(function (genre) {
 
             var movies = genreMovies.get(genre);
 
@@ -90,11 +77,12 @@
             //console.log(movies.slice(0, 10));
             var obj = {
                 "name" : genre,
-                "children": movies.slice(0, 3).map(function (m) {
+                "children": movies.slice(0, 5).map(function (m) {
                     return {
                         "name" : m.primaryTitle,
                         "rating" : m.averageRating,
-                        "votes" : m.numVotes
+                        "votes" : m.numVotes,
+                        "tconst": m.tconst
                     }
                 } )
             }
@@ -107,9 +95,11 @@
             "children": children
         };
 
+        g.html("");
+
 
         var cluster = d3.cluster()
-            .size([height, width - 450]);  // 450 is the margin I will have on the right side
+            .size([height, width - 500]);  // 450 is the margin I will have on the right side
 
         // Give the data to this cluster layout:
         var root = d3.hierarchy(dendogramData, function(d) {
@@ -172,11 +162,11 @@
         var leafNodeG = g.selectAll(".node--leaf")
             .append("g")
             .attr("class", "node--leaf-g")
-            .attr("transform", "translate(" + 8 + "," + -13 + ")");
+            .attr("transform", "translate(" + 8 + "," + -10 + ")");
 
         var xScale =  d3.scaleLinear()
             .domain([3, 10.0])
-            .range([0, 350]);
+            .range([0, 450]);
 
         var xAxis = d3.axisTop()
             .scale(xScale)
@@ -195,6 +185,20 @@
                 return xScale(d.data.rating);
             });
 
+        leafNodeG.append("svg:a")
+            .attr("xlink:href", function(d){
+                return "https://www.imdb.com/title/" + d.data.tconst;
+            })
+            .attr("xlink:target", "_blank")
+            .append("text")
+            .attr("dy", 19.5)
+            .attr("x", 8)
+            .style("text-anchor", "start")
+            .text(function (d) {
+                return d.data.name;
+            });
+
+        /*
         leafNodeG.append("text")
             .attr("dy", 19.5)
             .attr("x", 8)
@@ -202,6 +206,8 @@
             .text(function (d) {
                 return d.data.name;
             });
+
+         */
 
         // Write down text for every parent datum
         var internalNode = g.selectAll(".node--internal");
@@ -218,6 +224,7 @@
 
 
         // x-scale and x-axis
+
         var experienceName = ["", "","","","",""];
         var formatSkillPoints = function (d) {
             return experienceName[d % 6];
@@ -226,10 +233,15 @@
 
         // Attach axis on top of the first leaf datum.
         var firstEndNode = g.select(".node--leaf");
+
         firstEndNode.insert("g")
             .attr("class","xAxis")
-            .attr("transform", "translate(" + 7 + "," + -14 + ")")
+            .attr("transform", "translate(" + 10 + "," + -9 + ")")
             .call(xAxis);
+
+
+
+
 
 
     }
