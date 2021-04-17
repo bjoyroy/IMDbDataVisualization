@@ -13,7 +13,9 @@
     var svg, g;
 
     d3.tsv(movie_tsv_file).then(function (movies) {
-        //console.log(movies);
+        year = +(d3.select("#yearSlider").property('value'));
+
+        console.log(year);
 
         var sMovies = movies.filter(function (d) {
             var year = +(d.startYear);
@@ -27,12 +29,24 @@
 
     });
 
+    d3.select("#yearSlider")
+        .on("change", function () {
+            year = +(d3.select(this).property('value'));
+            console.log(year);
+
+            d3.select("#yearText").text(year);
+            createDendrogram(moviesByYearGenre.get(year), year);
+        })
+
+    /*
     d3.select("#year_select")
         .on('change', function () {
             var year = +(d3.select(this).property('value'));
             console.log(year);
             createDendrogram(moviesByYearGenre.get(year), year);
         });
+
+     */
 
     function setupSVG() {
         // append the svg object to the body of the page
@@ -43,7 +57,9 @@
             .append("g")
             .attr("transform", "translate(40,0)");  // bit of margin on the left = 40
 
-        g = svg.append("g").attr("transform", "translate(5,5)");
+        g = svg.append("g")
+            .attr("class", "dendro-g")
+            .attr("transform", "translate(5,5)");
     }
 
 
@@ -54,11 +70,14 @@
         var index = 0;
 
         Array.from(genreMovies.keys()).forEach(function (genre) {
-            if(index < 6){
+            /*
+            if(index < 3){
                 index++;
             } else {
                 return;
             }
+
+             */
 
             var movies = genreMovies.get(genre);
 
@@ -71,7 +90,7 @@
             //console.log(movies.slice(0, 10));
             var obj = {
                 "name" : genre,
-                "children": movies.slice(0, 5).map(function (m) {
+                "children": movies.slice(0, 3).map(function (m) {
                     return {
                         "name" : m.primaryTitle,
                         "rating" : m.averageRating,
@@ -90,12 +109,14 @@
 
 
         var cluster = d3.cluster()
-            .size([height, width - 450]);  // 100 is the margin I will have on the right side
+            .size([height, width - 450]);  // 450 is the margin I will have on the right side
 
         // Give the data to this cluster layout:
         var root = d3.hierarchy(dendogramData, function(d) {
             return d.children;
         });
+
+        //console.log(root.descendants());
 
         cluster(root);
 
@@ -121,16 +142,33 @@
 
         // Add a circle for each node.
         var node = g.selectAll(".node")
-            .data(root.descendants())
-            .enter().append("g")
+            .data(root.descendants());
+
+        node.enter().append("g")
+            .merge(node)
             .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
             .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
-        // Draw every datum a small circle.
-        node.append("circle")
+
+        node.exit().remove();
+
+        var circle = g.selectAll(".circle").data(root.descendants());
+
+        circle.enter()
+            .append("circle")
+            .merge(circle)
+            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+            .attr("class", "circle")
             .attr("r", 3);
 
+        circle.exit().remove();
+
+        //console.log(circle);
+
+
         // Setup G for every leaf datum.
+        g.selectAll(".node--leaf").selectAll("g.node--leaf-g").remove();
+
         var leafNodeG = g.selectAll(".node--leaf")
             .append("g")
             .attr("class", "node--leaf-g")
@@ -152,11 +190,10 @@
             .attr("rx", 2)
             .attr("ry", 2)
             .transition()
-            .duration(800)
+            .duration(300)
             .attr("width", function (d) {
                 return xScale(d.data.rating);
             });
-
 
         leafNodeG.append("text")
             .attr("dy", 19.5)
@@ -168,7 +205,11 @@
 
         // Write down text for every parent datum
         var internalNode = g.selectAll(".node--internal");
+
+        internalNode.selectAll("text.year-genre-text").remove();
+
         internalNode.append("text")
+            .attr("class", "year-genre-text")
             .attr("y", -10)
             .style("text-anchor", "middle")
             .text(function (d) {
@@ -189,12 +230,6 @@
             .attr("class","xAxis")
             .attr("transform", "translate(" + 7 + "," + -14 + ")")
             .call(xAxis);
-
-
-
-
-
-
 
 
     }
