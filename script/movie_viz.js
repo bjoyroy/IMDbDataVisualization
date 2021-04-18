@@ -31,6 +31,7 @@
         setupSVG();
         moviesByYearGenre = d3.group(sMovies, d => +(d.startYear), d => d.genres);
         createDendrogram(moviesByYearGenre.get(year), year);
+        createBarChart(year);
 
 
     });
@@ -42,6 +43,7 @@
 
             d3.select("#yearText").text(year);
             createDendrogram(moviesByYearGenre.get(year), year);
+            createBarChart(year);
         })
 
     function setupSVG() {
@@ -309,7 +311,58 @@
 
     }
     
-    function crateBarChart() {
+    function createBarChart(year) {
+        //console.log(year);
+        var moviesByGenre = moviesByYearGenre.get(year);
+        //console.log(moviesByGenre);
+
+        //var presentGenres = Array.from(moviesByGenre.keys());
+
+        //console.log(d3.map().entries(moviesByGenre));
+
+        var genreMovieNumber = [];
+
+
+        moviesByGenre.forEach(function (value, key) {
+            //console.log(value);
+            var obj = {
+              "genre": key,
+              "movies": value.length
+            };
+
+            genreMovieNumber.push(obj);
+
+        });
+        
+        var total = genreMovieNumber.reduce((acc, item) => {
+            var currentTotal = acc + item.movies;
+            return currentTotal;
+        }, 0);
+
+        console.log(total);
+
+
+        genreMovieNumber.sort(function (m1, m2) {
+            var movieNum1 = +(m1.movies);
+            var movieNum2 = +(m2.movies);
+            return movieNum2 - movieNum1;
+        });
+
+        //console.log(genreMovieNumber);
+
+        //var genreToDisplay = genreMovieNumber.splice(0, 10);
+
+        var genreToDisplay = genreMovieNumber.map(function (obj) {
+            return {
+                "genre": obj.genre,
+                "moviePct": +((obj.movies / total * 100).toFixed(2))
+            }
+        })
+
+        console.log(genreToDisplay);
+
+
+
 
     }
 
