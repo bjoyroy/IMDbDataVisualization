@@ -16,20 +16,23 @@
 
     d3.tsv(movie_tsv_file).then(function (movies) {
         movies = movies.filter(function (d) {
-            return d.genres != "\\N";
+            var year = +(d.startYear);
+            return d.genres != "\\N" && year >= starYear;
         });
 
         year = +(d3.select("#yearSlider").property('value'));
 
-        console.log(movies);
 
+        console.log(movies);
+        /*
         var sMovies = movies.filter(function (d) {
             var year = +(d.startYear);
             return year >= starYear;
         });
+         */
 
         setupSVG();
-        moviesByYearGenre = d3.group(sMovies, d => +(d.startYear), d => d.genres);
+        moviesByYearGenre = d3.group(movies, d => +(d.startYear), d => d.genres);
         createDendrogram(moviesByYearGenre.get(year), year);
         createBarChart(year);
 
