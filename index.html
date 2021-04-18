@@ -15,9 +15,17 @@
             transition: opacity .2s;
         }
 
-        .movie-histogram {
-            height: 1000px;
-
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            width: 60px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: white;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
         }
 
         .legend1 {
@@ -25,6 +33,13 @@
             position: relative;
             top: -2575px;
             right: 0px;
+        }
+
+
+        div.grid-container {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            grid-gap: 20px;
         }
     </style>
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
@@ -39,14 +54,15 @@
         <button id='btn_animation' class="button">Play</button>
         <br><br>
     </div>
-
-    <div id="movie_histogram">
-
+    <div class="grid-container">
+        <div id="movie_dendrogram">
+            <!--<div id="legend1" style="display: inline-block"></div>-->
+        </div>
+        <div id="movie_histogram" class="movie-histogram"></div>
     </div>
 
-    <div id="my_dataviz" class="movie-histogram">
-        <!--<div id="legend1" style="display: inline-block"></div>-->
-    </div>
+
+    <div class="tooltip"></div>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3-array.v2.min.js"></script>

@@ -12,7 +12,7 @@
     var nodeRadius = 3;
 
     // svg global variables
-    var svg, g, votesDiv;
+    var dsvg, dg, votesDiv;
 
     d3.tsv(movie_tsv_file).then(function (movies) {
         movies = movies.filter(function (d) {
@@ -46,19 +46,20 @@
 
     function setupSVG() {
         // append the svg object to the body of the page
-        svg = d3.select("#my_dataviz")
+        dsvg = d3.select("#movie_dendrogram")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
             //.attr("viewBox", [0, 0, 400, 500])
             .append("g")
-            .attr("transform", "translate(40,20)");  // bit of margin on the left = 40
+            .attr("transform", "translate(40,0)");  // bit of margin on the left = 40
 
-        g = svg.append("g")
+        dg = dsvg.append("g")
             .attr("class", "dendro-g")
             .attr("transform", "translate(5,5)");
 
-        votesDiv = d3.select("#my_dataviz")
+
+        votesDiv = d3.select("#movie_dendrogram")
             .append("div")
             .attr("id", "legend1")
             .attr("class", "legend1");
@@ -129,7 +130,8 @@
             "children": children
         };
 
-        g.html("");
+        dg.html("");
+        votesDiv.html("");
 
 
         var cluster = d3.cluster()
@@ -144,7 +146,7 @@
         cluster(root);
 
         // Add the links between nodes:
-        var link = g.selectAll('.d-link')
+        var link = dg.selectAll('.d-link')
             .data( root.descendants().slice(1) );
 
         link.enter()
@@ -164,7 +166,7 @@
 
 
         // Add a circle for each node.
-        var node = g.selectAll(".node")
+        var node = dg.selectAll(".node")
             .data(root.descendants());
 
         node.enter().append("g")
@@ -175,7 +177,7 @@
 
         node.exit().remove();
 
-        var circle = g.selectAll(".circle").data(root.descendants());
+        var circle = dg.selectAll(".circle").data(root.descendants());
 
         circle.enter()
             .append("circle")
@@ -190,9 +192,9 @@
 
 
         // Setup G for every leaf datum.
-        g.selectAll(".node--leaf").selectAll("g.node--leaf-g").remove();
+        dg.selectAll(".node--leaf").selectAll("dg.node--leaf-g").remove();
 
-        var leafNodeG = g.selectAll(".node--leaf")
+        var leafNodeG = dg.selectAll(".node--leaf")
             .append("g")
             .attr("class", "node--leaf-g")
             .attr("transform", "translate(" + 8 + "," + -10 + ")");
@@ -206,7 +208,7 @@
             .ticks(5)
             .tickFormat(formatSkillPoints);
 
-        leafNodeG.append("rect")
+        var rect = leafNodeG.append("rect")
             .attr("class","shadow")
             .style("fill", function (d) {
                 //console.log(d.data.votes);
@@ -214,16 +216,27 @@
                 return mostVoteColorScale(d.data.votes);
                 //return d3.interpolateYlGn(value);
             })
-            .attr("height", movieRatingBarHeight)
+            .attr("height", movieRatingBarHeight);
             //.attr("rx", 2)
             //.attr("ry", 2)
             //.attr("stroke", "black")
             //.attr("stroke-width", "0.5px")
+        /*
             .transition()
             .duration(300)
             .attr("width", function (d) {
                 return xScale(d.data.rating);
             });
+
+         */
+
+
+        rect.transition()
+            .duration(300)
+            .attr("width", function (d) {
+                return xScale(d.data.rating);
+            });
+
 
 
         leafNodeG.append("line")
@@ -260,7 +273,7 @@
 
 
         // Write down text for every parent datum
-        var internalNode = g.selectAll(".node--internal");
+        var internalNode = dg.selectAll(".node--internal");
 
         internalNode.selectAll("text.year-genre-text").remove();
 
@@ -284,7 +297,7 @@
 
 
         // Attach axis on top of the first leaf datum.
-        var firstEndNode = g.select(".node--leaf");
+        var firstEndNode = dg.select(".node--leaf");
 
         firstEndNode.insert("g")
             .attr("class","xAxis")
@@ -293,6 +306,10 @@
 
         continuous("#legend1", mostVoteColorScale);
 
+
+    }
+    
+    function crateBarChart() {
 
     }
 
@@ -346,20 +363,31 @@
         var legendaxis = d3.axisRight()
             .scale(legendscale)
             .tickSize(6)
-            .ticks(8);
+            .ticks(10);
 
-        var svg = d3.select(selector_id)
+        var legendSvg = d3.select(selector_id)
             .append("svg")
             .attr("height", (legendheight) + "px")
-            .attr("width", (legendwidth) + "px")
+            .attr("width", (legendwidth + 20) + "px")
             .style("position", "absolute")
             .style("left", "0px")
             .style("top", "0px")
 
-        svg
+        legendSvg
             .append("g")
             .attr("class", "axis")
             .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
             .call(legendaxis);
+
+        legendSvg.append("g")
+            .attr("transform", "translate(70, 200)")
+            .append("text")
+            .text("# of Votes")
+            .attr("dy", "1em")
+            .attr("transform", "rotate(270)")
+            //.attr("font-weight", "bold")
+            .style("text-anchor", "start")
+            .style("fill", "black");
+
     };
 })();
