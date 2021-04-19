@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <title>Genre Popularity Over Time</title>
     <style type="text/css">
+        h1 {
+            text-align: center;
+        }
+
+        div.control-panel{
+            margin-left: 50px;
+        }
+        
         #line{
             /*
             margin: 50px 50px;
@@ -27,12 +35,48 @@
         ​</style>
 </head>
 <body>
-<div class="cont">
+<h1>Genre Popularity Rank Over The Years</h1>
+<div class="control-panel">
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-0" value="Action"><label>Action</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-1" value="Adult"><label>Adult</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-2" value="Adventure"><label>Adventure</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-3" value="Animation"><label>Animation</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-4" value="Biography"><label>Biography</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-5" value="Comedy" checked><label>Comedy</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-6" value="Crime"><label>Crime</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-7" value="Documentary"><label>Documentary</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-8" value="Drama"><label>Drama</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-9" value="Family"><label>Family</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-10" value="Fantasy"><label>Fantasy</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-11" value="Film-Noir"><label>Film-Noir</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-12" value="History"><label>History</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-13" value="Horror"><label>Horror</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-14" value="Music"><label>Music</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-15" value="Musical"><label>Musical</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-16" value="Mystery"><label>Mystery</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-17" value="News"><label>News</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-18" value="Reality-TV"><label>Reality-TV</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-19" value="Romance" checked><label>Romance</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-20" value="Sci-Fi"><label>Sci-Fi</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-21" value="Short"><label>Short</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-22" value="Sport"><label>Sport</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-23" value="Thriller"><label>Thriller</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-24" value="War"><label>War</label>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" class="checkbox-genre input-src" id="check-genre-25" value="Western" checked><label>Western</label>&nbsp;&nbsp;&nbsp;
 
+
+</div>
+<br>
+<div class='control-panel'>
+    <label for="slider">Transition Time</label><br>
+    <label>1 sec</label><input type="range" id="slider" class='slider input-src' min="1000" max="20000" value="1000" step="1000" /><label>20 sec</label>
+    <br>
+    <button id='btn_animation' class="button input-src">Draw Popularity Rank Lines</button>
+    <br><br>
 </div>
 <div class="grid-container">
     <div id="line"></div>​
-    <div>Hello, world</div>
+    <div></div>
 </div>
 
 
