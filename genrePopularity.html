@@ -5,15 +5,36 @@
     <title>Genre Popularity Over Time</title>
     <style type="text/css">
         #line{
+            /*
             margin: 50px 50px;
+
+             */
         }
         button {
             margin: 20px 0 0 20px;
         }
+
+        .end-text{
+            fill: black;
+            stroke: black;
+        }
+
+        div.grid-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-gap: 10px;
+        }
         ​</style>
 </head>
 <body>
-<div id="line"></div>​
+<div class="cont">
+
+</div>
+<div class="grid-container">
+    <div id="line"></div>​
+    <div>Hello, world</div>
+</div>
+
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://d3js.org/d3-array.v2.min.js"></script>
