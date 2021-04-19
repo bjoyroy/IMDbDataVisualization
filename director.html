@@ -3,10 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        div.outer {
+            margin-left: 50px;
+        }
+
+        div.grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+            margin-left: 50px;
+        }
+    </style>
     <title>Director</title>
 </head>
 <body>
-<div id="director_scatter"></div>
+<h1>Director, Age and Best Work</h1>
+<div class="grid-container">
+    <div id="director_age"></div>
+    <div id="director_top_age"></div>
+</div>
+
+<div class="outer">
+    <label for="director">Kindly select a director:</label>
+    <select name="director" id="director">
+        <option value=""></option>
+        <option value="nm0594503">Hayao Miyazaki</option>
+        <option value="nm0001392">Peter Jackson</option>
+        <option value="nm0006249">Satyajit Ray</option>
+        <option value="nm0000229">Steven Spielberg</option>
+        <option value="nm0005222">Sam Mendes</option>
+    </select>
+</div>
+
+<div class="outer">
+
+
+    <div id="director_movies"></div>
+    <!--
+    <input list="director" name="director" id="director">
+    <datalist id="directors">
+        <option value="nm0594503">Hayao Miyazaki</option>
+        <option value="nm0001392">Peter Jackson</option>
+        <option value="nm0006249">Satyajit Ray</option>
+        <option value="nm0000229">Steven Spielberg</option>
+        <option value="nm0005222">Sam Mendes</option>
+    </datalist>
+    -->
+</div>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://d3js.org/d3-array.v2.min.js"></script>

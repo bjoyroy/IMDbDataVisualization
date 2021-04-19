@@ -2,37 +2,39 @@
     var movie_tsv_file = 'data/movie_name_rating_genre.tsv';
     var starYear = 1930;
     var year = 2018;
-    var moviesByYearGenre;
+    var allMovies, moviesByYearGenre;
     var numberOfMoviesInBar = 5;
+    var numberOfVotes = 0;
     var movieRatingBarHeight = 25;
 
     // design specific global variables
-    var width = 1300
+    var width = 1200
     var height = 3000
     var nodeRadius = 3;
 
+    var margin = {
+        top: 50,
+        left: 25,
+        right: 10,
+        bottom: 50
+    };
+    var bWidth = 800, bHeight = 1000;
+
     // svg global variables
     var dsvg, dg, votesDiv;
+    var bsvg, bg, yScale, xScale;
 
-    d3.tsv(movie_tsv_file).then(function (movies) {
-        movies = movies.filter(function (d) {
+    d3.tsv(movie_tsv_file).then(function (m) {
+
+        allMovies = m.filter(function (d) {
             var year = +(d.startYear);
             return d.genres != "\\N" && year >= starYear;
         });
 
         year = +(d3.select("#yearSlider").property('value'));
 
-
-        console.log(movies);
-        /*
-        var sMovies = movies.filter(function (d) {
-            var year = +(d.startYear);
-            return year >= starYear;
-        });
-         */
-
         setupSVG();
-        moviesByYearGenre = d3.group(movies, d => +(d.startYear), d => d.genres);
+        moviesByYearGenre = d3.group(allMovies, d => +(d.startYear), d => d.genres);
         createDendrogram(moviesByYearGenre.get(year), year);
         createBarChart(year);
 
@@ -42,11 +44,36 @@
     d3.select("#yearSlider")
         .on("change", function () {
             year = +(d3.select(this).property('value'));
+            //numberOfVotes = +(d3.select(this).property('value'));
             //console.log(year);
 
             d3.select("#yearText").text(year);
+
+            if(moviesByYearGenre.get(year) == null){
+                // clean it
+                createDendrogram([], year);
+            } else {
+                createDendrogram(moviesByYearGenre.get(year), year);
+                createBarChart(year);
+            }
+
+        })
+
+    d3.select("#voteSlider")
+        .on("change", function () {
+            numberOfVotes = +(d3.select(this).property('value'));
+            //console.log(numberOfVotes);
+            d3.select("#voteText").text(numberOfVotes);
+
+            var filteredMovies = allMovies.filter(function (d, i) {
+                return +(d.numVotes) > numberOfVotes;
+            });
+
+            moviesByYearGenre = d3.group(filteredMovies, d => +(d.startYear), d => d.genres);
+
             createDendrogram(moviesByYearGenre.get(year), year);
             createBarChart(year);
+
         })
 
     function setupSVG() {
@@ -68,6 +95,39 @@
             .append("div")
             .attr("id", "legend1")
             .attr("class", "legend1");
+
+        bsvg = d3.select("#movie_histogram")
+            .append("svg")
+            .attr("width", bWidth)
+            .attr("height", bHeight)
+            //.attr("viewBox", [0, 0, 400, 500])
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        bg = bsvg.append("g")
+            .attr("class", "bar-g")
+            .attr("transform", "translate(5,5)");
+
+        xScale = d3.scaleLinear()
+            .domain([0, 50])
+            .range([0, bWidth - margin.right]);
+
+        var xAxis = d3.axisBottom().scale(xScale);
+
+        bsvg.append("g")
+            .call(xAxis);
+
+        yScale = d3.scaleBand()
+            //.domain(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
+            .domain(d3.range(1, 11))
+            .range([margin.top, bHeight - margin.bottom])
+            .padding(0.1);
+
+        var yAxis = d3.axisLeft().scale(yScale);
+
+        bsvg.append('g')
+            .call(yAxis);
+
     }
 
 
@@ -222,18 +282,6 @@
                 //return d3.interpolateYlGn(value);
             })
             .attr("height", movieRatingBarHeight);
-            //.attr("rx", 2)
-            //.attr("ry", 2)
-            //.attr("stroke", "black")
-            //.attr("stroke-width", "0.5px")
-        /*
-            .transition()
-            .duration(300)
-            .attr("width", function (d) {
-                return xScale(d.data.rating);
-            });
-
-         */
 
 
         rect.transition()
@@ -274,7 +322,13 @@
                 return d.data.name;
             })
             .attr("font-weight", "bold")
-            .style("fill", "#b84774");
+            //.style("fill", "#b84774")
+            .style("fill", function (d) {
+                var color = mostVoteColorScale(d.data.votes);
+                //console.log(color);
+                //console.log(colorComplement(color));
+                return colorComplement(color);
+            });
 
 
         // Write down text for every parent datum
@@ -306,8 +360,10 @@
 
         firstEndNode.insert("g")
             .attr("class","xAxis")
-            .attr("transform", "translate(" + 10 + "," + -15 + ")")
+            .attr("transform", "translate(" + 10 + "," + -10 + ")")
             .call(xAxis);
+
+        //console.log(mostVoteColorScale(1000));
 
         continuous("#legend1", mostVoteColorScale);
 
@@ -315,13 +371,62 @@
     }
     
     function createBarChart(year) {
-        //console.log(year);
+        var genreToDisplay = processBarchartInfo(year);
+        //console.log(genreToDisplay);
+        displayBarChart(genreToDisplay)
+
+    }
+
+    function displayBarChart(info) {
+        console.log(info);
+
+        bg.selectAll(".b-rect")
+            .data(info)
+            .join("rect")
+            .attr("class", "b-rect" )
+            .attr("x", function (d, i) {
+                //return xScale(d.moviePct);
+                return margin.left;
+            })
+            .attr("y", function (d, i) {
+                return yScale(i + 1);
+            })
+            .attr("width", function (d, i) {
+                return xScale(d.moviePct);
+            })
+            //.attr("height", yScale.scaleBand())
+            .attr("height", yScale.bandwidth())
+            .attr("fill", "#4682b4");
+
+
+
+        bg.selectAll(".b-text")
+            .data(info)
+            .join("text")
+            .attr("class", "b-text")
+            .attr("fill", "black")
+            .attr("x", function (d, i) {
+                return xScale(d.moviePct) + 25;
+            })
+            .attr("y", function (d, i) {
+                return yScale(i + 1) + yScale.bandwidth() / 2;
+            })
+            .attr("dy", "0.5em")
+            .text(function (d, i) {
+                if(d.genre !== "N/A")
+                    return d.genre;
+
+                return "";
+            });
+
+
+
+
+
+    }
+    
+    function processBarchartInfo(year) {
         var moviesByGenre = moviesByYearGenre.get(year);
-        //console.log(moviesByGenre);
-
-        //var presentGenres = Array.from(moviesByGenre.keys());
-
-        //console.log(d3.map().entries(moviesByGenre));
 
         var genreMovieNumber = [];
 
@@ -329,20 +434,20 @@
         moviesByGenre.forEach(function (value, key) {
             //console.log(value);
             var obj = {
-              "genre": key,
-              "movies": value.length
+                "genre": key,
+                "movies": value.length
             };
 
             genreMovieNumber.push(obj);
 
         });
-        
+
         var total = genreMovieNumber.reduce((acc, item) => {
             var currentTotal = acc + item.movies;
             return currentTotal;
         }, 0);
 
-        console.log(total);
+        //console.log(total);
 
 
         genreMovieNumber.sort(function (m1, m2) {
@@ -362,9 +467,37 @@
             }
         })
 
-        console.log(genreToDisplay);
+        //console.log(genreToDisplay);
+
+        genreToDisplay = genreToDisplay.splice(0, 10);
 
 
+
+        var lnth = genreToDisplay.length;
+
+        if(lnth < 10){
+            var obj = {
+                "genre": "N/A",
+                "moviePct": 0
+            }
+            for (var i = lnth; i < 10; i++){
+                genreToDisplay.push(obj);
+            }
+        }
+
+        return genreToDisplay;
+    }
+
+    function colorComplement(color) {
+        try{
+            var cc = color.replace(/[^\d,]/g, '').split(',');
+            var r = 255 - +(cc[0]);
+            var g = 255 - +(cc[1]);
+            var b = 255 - +(cc[2]);
+            return "rgb(" + r + ", " + g + ", " + b + ")";
+        } catch(ex){
+            return color;
+        }
 
 
     }

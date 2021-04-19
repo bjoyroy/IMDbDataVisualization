@@ -2,6 +2,7 @@
     var director_tsv_file = 'data/title_rating_principals_director.tsv';
     var directors;
     var directorFirstLatestAndBest;
+    var directorMovies;
 
     const padding = 25;
     const scatterplot_size = 500;
@@ -9,6 +10,10 @@
     const svg_width = scatterplot_size + 2 * padding;
     const svg_height = svg_width;
     const breathing_space = 5;
+    const aSvgWidth = 600;
+
+    const aSvgHeight = 500;
+    const apadding = 30;
 
     const types = ["HighestRated", "FirstMovie", "LatestMovie"];
     var age_scale, rating_scale;
@@ -16,31 +21,311 @@
     var svg, d_scatter_g;
 
     d3.tsv(director_tsv_file).then(function (allDirectors) {
-        //console.log(allDirectors);
+
+
         directors = allDirectors.filter(function (d) {
             return +(d.birthYear) > 0 && +(d.startYear) > 0;
         });
 
-        //console.log(directors);
+        console.log(directors);
 
         // add age during release
         directors.forEach(function (d, i) {
             directors[i].age = +(d.startYear) - +(d.birthYear);
         })
 
+        var ageAndMovies  = d3.rollup(directors,
+            v => {
+                return {
+                    //"noMovi": +((v.length / directors.length * 100).toFixed(2)),
+                    "movies": v.map(m => m.tconst),
+                    "noMovies": v.length,
+                    "age": v[0].age
+                }
+            },
+            d => d.age
+        );
+
+        console.log(ageAndMovies);
+
+        drawDirectorAge(ageAndMovies);
+
         //console.log(directors);
 
-        var directorMovies = d3.group(directors, d => d.nconst);
+        directorMovies = d3.group(directors, d => d.nconst);
 
-        console.log(directorMovies);
+        //console.log(directorMovies);
 
-        directorFirstLatestAndBest = getFirstAndBest(directorMovies);
-        //console.log(directorFirstLatestAndBest);
-        setupScatterPlot();
+        var directorFirstLatestAndBest = getFirstAndBest(directorMovies);
+        var directorBestMovie = directorFirstLatestAndBest.filter(function (d) {
+            return d.typeValue == 0;
+        })
+        console.log(directorBestMovie);
 
-        drawScatterPlot(directorFirstLatestAndBest);
+        var bestMovieAge = d3.rollup(directorBestMovie,
+            v => {
+                return {
+                    "age": v[0].age,
+                    "noMovies": v.length
+                }
+            },
+            d => d.age);
+        console.log(bestMovieAge);
+        drawBestMovieAge(bestMovieAge);
+
 
     });
+
+    d3.select("#director").on("change", function () {
+        //console.log(d3.select(this));
+        var directorId = d3.select(this).property("value");
+
+        var movies = directorMovies.get(directorId);
+
+        console.log(movies);
+        drawDirectorMovies(movies);
+
+
+    })
+
+    function drawDirectorMovies(ageMovies){
+        d3.select("#director_movies").html("");
+
+        var svg = d3.select("#director_movies")
+            .append("svg")
+            .attr("width", 2 * aSvgWidth + 2 * apadding)
+            .attr("height", aSvgHeight + 2 *  apadding);
+
+        var ageRange = d3.extent(ageMovies.map(m => m.age));
+
+        console.log(ageRange);
+
+        var xScale = d3.scaleLinear()
+            .domain([ageRange[0] - 1, ageRange[1] + 5])
+            .range([0 + apadding, 2 * aSvgWidth]);
+
+        var yScale = d3.scaleLinear()
+            .domain([3, 10])
+            .range([aSvgHeight, 0 + apadding]);
+
+        var voteRange = d3.extent(ageMovies.map(m => +(m.numVotes)));
+
+        var voteScale = d3.scaleLinear()
+            .domain(voteRange)
+            .range([2, 5]);
+
+
+        var ag = svg.append("g")
+            .attr("transform", `translate(${apadding}, ${apadding})`);
+
+        var xAxis = d3.axisBottom().scale(xScale);
+        var yAxis = d3.axisLeft().scale(yScale);
+
+        svg.append('g')
+            .attr('transform', `translate(${0},${aSvgHeight})`)
+            .call(xAxis);
+
+        svg.append('g')
+            .attr('transform', `translate(${0},${aSvgHeight})`)
+            .call(xAxis);
+
+        svg.append('g')
+            .attr('transform', `translate(${apadding},${0})`)
+            .call(yAxis);
+
+        var sg = svg.append("g")
+            .attr("class", 'scatter-g');
+
+        var circles = sg.selectAll(".circle")
+            .data(ageMovies);
+
+        circles.enter().append('circle')
+            .attr("class", "circle")
+            .merge(circles)
+            .attr("cx", function (d) {
+                return xScale(d.age);
+            })
+            .attr("cy", function (d) {
+                return yScale(+(d.averageRating));
+            })
+            .attr("r", 2.5)
+            .attr("fill", "blue")
+            .on("mouseover", function (d) {
+                //console.log("Age: " + d.age);
+                //console.log("Number of Movies Directed: " + d.noMovies);
+            });
+
+        circles.exit().remove();
+
+        sg.append("text")
+            .attr("x", aSvgWidth)
+            .attr("y", aSvgHeight - padding)
+            .attr("dy", "1em")
+            .text("Age of Director");
+
+        sg.append("text")
+            .attr("x", apadding)
+            .attr("y", apadding)
+            .attr("dy", "1em")
+            .text("IMDb Rating")
+            .attr("transform", "rotate(90)translate(20, -80)");
+
+
+    }
+
+    function drawBestMovieAge(ageMovies) {
+        var svg = d3.select("#director_top_age")
+            .append("svg")
+            .attr("width", aSvgWidth + 2* apadding)
+            .attr("height", aSvgHeight + 2*  apadding);
+
+        var ageMovieArray = Array.from(ageMovies.values());
+
+        var ageRange = d3.extent(ageMovieArray.map(m => m.age));
+        var numMovieRange = d3.extent(ageMovieArray.map(m => m.noMovies));
+
+        //console.log(numMovieRange);
+
+        //console.log(ageRange);
+        var xScale = d3.scaleLinear()
+            .domain(ageRange)
+            .range([0 + apadding, aSvgWidth]);
+
+        var yScale = d3.scaleLinear()
+            .domain(numMovieRange)
+            .range([aSvgHeight, 0 + apadding]);
+
+        var ag = svg.append("g")
+            .attr("transform", `translate(${apadding}, ${apadding})`);
+
+        var xAxis = d3.axisBottom().scale(xScale);
+        var yAxis = d3.axisLeft().scale(yScale);
+
+        svg.append('g')
+            .attr('transform', `translate(${0},${aSvgHeight})`)
+            .call(xAxis);
+
+        svg.append('g')
+            .attr('transform', `translate(${apadding},${0})`)
+            .call(yAxis);
+
+        var sg = svg.append("g")
+            .attr("class", 'scatter-g');
+
+        var circles = sg.selectAll(".circle")
+            .data(ageMovieArray);
+
+        circles.enter().append('circle')
+            .attr("class", "circle")
+            .merge(circles)
+            .attr("cx", function (d) {
+                return xScale(d.age);
+            })
+            .attr("cy", function (d) {
+                return yScale(d.noMovies)
+            })
+            .attr("r", 2.5)
+            .attr("fill", "blue")
+            .on("mouseover", function (d) {
+                console.log("Age: " + d.age);
+                console.log("Number of Movies Directed: " + d.noMovies);
+            });
+
+        circles.exit().remove();
+
+        sg.append("text")
+            .attr("x", aSvgWidth / 2)
+            .attr("y", aSvgHeight - padding)
+            .attr("dy", "1em")
+            .text("Age of Directors");
+
+        sg.append("text")
+            .attr("x", padding)
+            .attr("y", padding)
+            .attr("dy", "1em")
+            .text("Number of Highest Rated Movies at Age")
+            .attr("transform", "rotate(90)translate(20, -80)");
+
+
+    }
+
+    function drawDirectorAge(ageMovies) {
+        //console.log(ageMovies);
+        var svg = d3.select("#director_age")
+            .append("svg")
+            .attr("width", aSvgWidth + 2* apadding)
+            .attr("height", aSvgHeight + 2*  apadding);
+
+
+
+        var ageMovieArray = Array.from(ageMovies.values())
+
+        var ageRange = d3.extent(ageMovieArray.map(m => m.age));
+        var numMovieRange = d3.extent(ageMovieArray.map(m => m.noMovies));
+
+        //console.log(numMovieRange);
+
+        //console.log(ageRange);
+        var xScale = d3.scaleLinear()
+            .domain(ageRange)
+            .range([0 + apadding, aSvgWidth]);
+
+        var yScale = d3.scaleLinear()
+            .domain(numMovieRange)
+            .range([aSvgHeight, 0 + apadding]);
+
+        var ag = svg.append("g")
+            .attr("transform", `translate(${apadding}, ${apadding})`);
+
+        var xAxis = d3.axisBottom().scale(xScale);
+        var yAxis = d3.axisLeft().scale(yScale);
+
+        svg.append('g')
+            .attr('transform', `translate(${0},${aSvgHeight})`)
+            .call(xAxis);
+
+        svg.append('g')
+            .attr('transform', `translate(${apadding},${0})`)
+            .call(yAxis);
+
+        var sg = svg.append("g")
+            .attr("class", 'scatter-g');
+
+        var circles = sg.selectAll(".circle")
+            .data(ageMovieArray);
+
+        circles.enter().append('circle')
+            .attr("class", "circle")
+            .merge(circles)
+            .attr("cx", function (d) {
+                return xScale(d.age);
+            })
+            .attr("cy", function (d) {
+                return yScale(d.noMovies)
+            })
+            .attr("r", 2.5)
+            .attr("fill", "blue")
+            .on("mouseover", function (d) {
+                console.log("Age: " + d.age);
+                console.log("Number of Movies Directed: " + d.noMovies);
+            });
+
+        circles.exit().remove();
+
+        sg.append("text")
+            .attr("x", aSvgWidth / 2)
+            .attr("y", aSvgHeight - padding)
+            .attr("dy", "1em")
+            .text("Age of Directors");
+
+        sg.append("text")
+            .attr("x", padding)
+            .attr("y", padding)
+            .attr("dy", "1em")
+            .text("Number of Movies Directed")
+            .attr("transform", "rotate(90)translate(20, -80)");
+
+    }
     
     function setupScatterPlot() {
         svg = d3.select('#director_scatter').append('svg')
@@ -150,7 +435,7 @@
     }
     
     function drawScatterPlot(data) {
-        console.log(data);
+        //console.log(data);
         var cirlce_sp = d_scatter_g.selectAll('circle').data(data);
 
         cirlce_sp.enter().append('circle').merge(cirlce_sp)

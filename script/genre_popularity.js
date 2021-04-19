@@ -18,6 +18,10 @@
     d3.tsv(movie_tsv_file).then(function (movies) {
         processData(movies);
         setupSVG();
+        console.log(colorFunc(1));
+        rgb = colorFunc(1).replace(/[^\d,]/g, '').split(',');
+
+        console.log(rgb);
 
         /*
         genreToView = ["Action", "Comedy",
