@@ -18,7 +18,7 @@
         right: 10,
         bottom: 50
     };
-    var bWidth = 800, bHeight = 1000;
+    var bWidth = 1000, bHeight = 1000;
 
     // svg global variables
     var dsvg, dg, votesDiv;
@@ -106,15 +106,19 @@
 
         bg = bsvg.append("g")
             .attr("class", "bar-g")
-            .attr("transform", "translate(5,5)");
+            .attr("transform", "translate(25,0)");
 
         xScale = d3.scaleLinear()
             .domain([0, 50])
             .range([0, bWidth - margin.right]);
 
+
         var xAxis = d3.axisBottom().scale(xScale);
 
-        bsvg.append("g")
+        bg.append("g")
+            //.attr("class", "b-xaxis")
+            //.attr('transform', `translate(${margin.left},${margin.top})`)
+            .attr('transform', `translate(25,25)`)
             .call(xAxis);
 
         yScale = d3.scaleBand()
@@ -125,8 +129,22 @@
 
         var yAxis = d3.axisLeft().scale(yScale);
 
-        bsvg.append('g')
+        bg.append('g')
+            //.attr("transform", "translate(10, 100)")
             .call(yAxis);
+
+        bg.append("text")
+            .attr("x", bWidth - 150)
+            .attr('y', 40)
+            .attr("dy", "1em")
+            .text("Percentage");
+
+        bg.append("text")
+            .attr("x", -20)
+            .attr('y', 100)
+            .attr("dy", "1em")
+            .text("Movie Rank")
+            .attr("transform", "rotate(90)translate(50, -90)");
 
     }
 
@@ -418,6 +436,8 @@
 
                 return "";
             });
+
+
 
 
 

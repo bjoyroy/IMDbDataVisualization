@@ -2,7 +2,7 @@
     var movie_tsv_file = 'data/movie_name_rating_genre.tsv';
     var startYear = 1930, endYear = 2020;
 
-    var width = 1800;
+    var width = 3000;
     var height = 1000;
     var rankData, data;
     var svg, xScale, yScale, pathg, infog, legendG;

@@ -101,7 +101,7 @@
         console.log(ageRange);
 
         var xScale = d3.scaleLinear()
-            .domain([ageRange[0] - 1, ageRange[1] + 5])
+            .domain([ageRange[0] - 1, ageRange[1] + 1])
             .range([0 + apadding, 2 * aSvgWidth]);
 
         var yScale = d3.scaleLinear()
@@ -111,8 +111,8 @@
         var voteRange = d3.extent(ageMovies.map(m => +(m.numVotes)));
 
         var voteScale = d3.scaleLinear()
-            .domain(voteRange)
-            .range([2, 5]);
+            .domain([Math.sqrt(voteRange[0]), Math.sqrt(voteRange[1])])
+            .range([5, 15]);
 
 
         var ag = svg.append("g")
@@ -139,6 +139,8 @@
         var circles = sg.selectAll(".circle")
             .data(ageMovies);
 
+        var div = d3.select(".tooltip");
+
         circles.enter().append('circle')
             .attr("class", "circle")
             .merge(circles)
@@ -148,12 +150,22 @@
             .attr("cy", function (d) {
                 return yScale(+(d.averageRating));
             })
-            .attr("r", 2.5)
+            .attr("r", function (d) {
+                return voteScale(Math.sqrt(+(d.numVotes)));
+            })
             .attr("fill", "blue")
             .on("mouseover", function (d) {
-                //console.log("Age: " + d.age);
-                //console.log("Number of Movies Directed: " + d.noMovies);
-            });
+                div.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                div.text(d.primaryTitle + " (" + d.startYear + ")") // state name mouseover
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+            }).on("mouseout", function () {
+                div.transition()
+                .duration(200)
+                .style("opacity", 0);
+        });
 
         circles.exit().remove();
 
@@ -169,6 +181,13 @@
             .attr("dy", "1em")
             .text("IMDb Rating")
             .attr("transform", "rotate(90)translate(20, -80)");
+
+        sg.append("text")
+            .attr("x", 2 * aSvgWidth - 100)
+            .attr("y", 30)
+            .attr("dy", "1em")
+            .text(ageMovies[0].primaryName)
+            .attr("font-weight", "bold");
 
 
     }

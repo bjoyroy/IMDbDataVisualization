@@ -9,7 +9,8 @@
         }
 
         div.outer {
-            margin-left: 50px;
+            width: 80%;
+            margin: 0 auto;
         }
 
         div.grid-container {
@@ -18,16 +19,30 @@
             grid-gap: 20px;
             margin-left: 50px;
         }
+
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            width: 100px;
+            height: 100px;
+            padding: 2px;
+            font: 12px sans-serif;
+            color: black;
+            background: white;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
     </style>
     <title>Director</title>
 </head>
 <body>
-<h1>Director, Age and Best Work</h1>
+<h1>Director Age and Number of Movies</h1>
 <div class="grid-container">
     <div id="director_age"></div>
     <div id="director_top_age"></div>
 </div>
-
+<hr>
 <div class="outer">
     <label for="director">Kindly select a director:</label>
     <select name="director" id="director">
@@ -37,24 +52,15 @@
         <option value="nm0006249">Satyajit Ray</option>
         <option value="nm0000229">Steven Spielberg</option>
         <option value="nm0005222">Sam Mendes</option>
+        <option value="nm0634240">Christopher Nolan</option>
     </select>
 </div>
-
+<h1>Director's Movies and Age</h1>
 <div class="outer">
-
-
     <div id="director_movies"></div>
-    <!--
-    <input list="director" name="director" id="director">
-    <datalist id="directors">
-        <option value="nm0594503">Hayao Miyazaki</option>
-        <option value="nm0001392">Peter Jackson</option>
-        <option value="nm0006249">Satyajit Ray</option>
-        <option value="nm0000229">Steven Spielberg</option>
-        <option value="nm0005222">Sam Mendes</option>
-    </datalist>
-    -->
 </div>
+
+<div class="tooltip"></div>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://d3js.org/d3-array.v2.min.js"></script>
