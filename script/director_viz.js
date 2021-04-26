@@ -27,12 +27,26 @@
             return +(d.birthYear) > 0 && +(d.startYear) > 0;
         });
 
-        console.log(directors);
+        //console.log(directors);
 
         // add age during release
         directors.forEach(function (d, i) {
             directors[i].age = +(d.startYear) - +(d.birthYear);
-        })
+        });
+
+        var uniqueDirectors = Array.from((d3.rollup(directors,
+            v => {
+                return {
+                    "nconst": v[0].nconst,
+                    "name": v[0].primaryName
+                }
+            },
+            d => d.nconst
+        )).values());
+
+        console.log(uniqueDirectors);
+
+        populateDatalist(uniqueDirectors);
 
         var ageAndMovies  = d3.rollup(directors,
             v => {
@@ -46,7 +60,7 @@
             d => d.age
         );
 
-        console.log(ageAndMovies);
+        //console.log(ageAndMovies);
 
         drawDirectorAge(ageAndMovies);
 
@@ -75,6 +89,17 @@
 
 
     });
+
+    function populateDatalist(directorList){
+        var datalist = document.getElementById("director_list");
+
+        directorList.forEach(function (d) {
+            var option = document.createElement("option");
+            option.text = d.name;
+            option.value = d.nconst;
+            datalist.appendChild(option);
+        });
+    }
 
     d3.select("#director").on("change", function () {
         //console.log(d3.select(this));

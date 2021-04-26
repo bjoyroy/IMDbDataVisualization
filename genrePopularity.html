@@ -10,6 +10,20 @@
         div.control-panel{
             margin-left: 50px;
         }
+
+        label {
+
+        }
+
+        label.label-for-slider{
+            margin-bottom: 5px;
+        }
+
+        input.checkbox-genre {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
         
         #line{
             /*
@@ -91,10 +105,10 @@
 </div>
 <br>
 <div class='control-panel'>
-    <label for="slider">Transition Time</label><br>
-    <label>1 sec</label><input type="range" id="slider" class='slider input-src' min="1000" max="20000" value="1000" step="1000" /><label>20 sec</label>
+    <label for="slider" class="label-for-slider">Transition Time</label><br>
+    <label>1 sec&nbsp;&nbsp;</label><input type="range" id="slider" class='slider input-src' min="1000" max="20000" value="1000" step="1000" /><label>&nbsp;&nbsp;20 sec</label>
     <br>
-    <button id='btn_animation' class="button input-src">Draw Popularity Rank Lines</button>
+    <button id='btn_animation' class="button input-src btn btn-primary">Draw Popularity Rank Lines</button>
     <br><br>
 </div>
 <div class="grid-container">

@@ -2,8 +2,8 @@
     var movie_tsv_file = 'data/movie_name_rating_genre.tsv';
     var startYear = 1930, endYear = 2020;
 
-    var width = 3000;
-    var height = 1000;
+    var width = 2000;
+    var height = 800;
     var rankData, data;
     var svg, xScale, yScale, pathg, infog, legendG;
 
@@ -18,17 +18,9 @@
     d3.tsv(movie_tsv_file).then(function (movies) {
         processData(movies);
         setupSVG();
-        console.log(colorFunc(1));
-        rgb = colorFunc(1).replace(/[^\d,]/g, '').split(',');
 
-        console.log(rgb);
+        var rgb = colorFunc(1).replace(/[^\d,]/g, '').split(',');
 
-        /*
-        genreToView = ["Action", "Comedy",
-            "Romance",
-            "Western"];
-
-         */
         genreToView = readCheckbox();
         doTheGraph(genreToView);
 

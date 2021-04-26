@@ -11,6 +11,7 @@
     var width = 1300 // width of dendrogram + barchart
     var height = 3000 // height of dendrogram + barchart
     var nodeRadius = 3;
+    var dHistrogramWidth = 700;
 
     var margin = {
         top: 50,
@@ -217,7 +218,7 @@
 
 
         var cluster = d3.cluster()
-            .size([height, width - 700]);  // 600 is the margin I will have on the right side
+            .size([height, width - dHistrogramWidth]);  // 600 is the margin I will have on the right side
 
         // Give the data to this cluster layout:
         var root = d3.hierarchy(dendogramData, function(d) {
@@ -283,7 +284,7 @@
 
         var xScale =  d3.scaleLinear()
             .domain([2.5, 10.0])
-            .range([0, 700]);
+            .range([0, dHistrogramWidth]);
 
         var xAxis = d3.axisTop()
             .scale(xScale)
