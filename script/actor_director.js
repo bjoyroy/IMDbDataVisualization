@@ -1,9 +1,9 @@
 (function () {
-    var width = 2000, height = 1500;
+    var width = 2500, height = 1500;
         d3.tsv("data/title_rating_principals_actor_director.tsv").then(function (ad) {
             var startYear = 2000;
             var endYear = 2010;
-            var minVote = 100000;
+            var minVote = 50000;
             var minRating = 7;
 
             var actorDirector = ad.filter(function (d) {
@@ -40,6 +40,8 @@
 
             var links = [];
 
+            //console.log(moviesActors);
+
 
             var directors = Array.from(directorMovies.keys());
 
@@ -47,18 +49,30 @@
                 var directorActorDict = {};
                 var movies = Array.from(directorMovies.get(d).keys());
 
-                movies.forEach(function (m) {
-                    var actors = moviesActors.get(m).map(function (minfo) {
-                        return minfo.nconst;
-                    });
 
-                    actors.forEach(function (a) {
-                        if(directorActorDict[a] == null){
-                            directorActorDict[a] = 1;
-                        } else {
-                            directorActorDict[a] = directorActorDict[a] + 1;
-                        }
-                    });
+
+                movies.forEach(function (m) {
+                    //console.log(m);
+                    //console.log(moviesActors.get(m));
+                    //console.lolg(m);
+                    //console.log(moviesActors);
+
+                    try{
+                        var actors = moviesActors.get(m).map(function (minfo) {
+                            return minfo.nconst;
+                        });
+
+                        actors.forEach(function (a) {
+                            if(directorActorDict[a] == null){
+                                directorActorDict[a] = 1;
+                            } else {
+                                directorActorDict[a] = directorActorDict[a] + 1;
+                            }
+                        });
+                    } catch(error){
+
+                    }
+
                 });
 
                 Object.keys(directorActorDict).forEach(function (a) {
@@ -84,7 +98,8 @@
 
             const simulation = d3.forceSimulation(nodes)
                 .force("link", d3.forceLink(links).id(d => d.id))
-                .force("charge", d3.forceManyBody())
+                .force("charge", d3.forceManyBody(100000))
+                //.force("strength", d3.forceManyBody(100))
                 //.force("gravity", 0.5)
                 .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -119,7 +134,7 @@
                     .attr("cy", d => d.y);
             });
 
-            invalidation.then(() => simulation.stop());
+            //invalidation.then(() => simulation.stop());
 
 
 

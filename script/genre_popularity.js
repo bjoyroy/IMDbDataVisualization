@@ -172,8 +172,10 @@
 
             var uniqueMovieNumberSet = new Set();
             var movieNumbers = [];
+            console.log(moviesByGenre);
 
             genresForAnimation.forEach(function (d) {
+
                 var movieGenre = moviesByGenre.get(d);
 
 

@@ -44,9 +44,9 @@
             d => d.nconst
         )).values());
 
-        console.log(uniqueDirectors);
+        //console.log(uniqueDirectors);
 
-        populateDatalist(uniqueDirectors);
+
 
         var ageAndMovies  = d3.rollup(directors,
             v => {
@@ -68,13 +68,15 @@
 
         directorMovies = d3.group(directors, d => d.nconst);
 
+        populateDatalist(uniqueDirectors);
+
         //console.log(directorMovies);
 
         var directorFirstLatestAndBest = getFirstAndBest(directorMovies);
         var directorBestMovie = directorFirstLatestAndBest.filter(function (d) {
             return d.typeValue == 0;
         })
-        console.log(directorBestMovie);
+        //console.log(directorBestMovie);
 
         var bestMovieAge = d3.rollup(directorBestMovie,
             v => {
@@ -84,7 +86,7 @@
                 }
             },
             d => d.age);
-        console.log(bestMovieAge);
+        //console.log(bestMovieAge);
         drawBestMovieAge(bestMovieAge);
 
 
@@ -99,15 +101,36 @@
             option.value = d.nconst;
             datalist.appendChild(option);
         });
+
+        var directorElement = document.getElementById("director");
+
+        directorElement.value = "nm0594503"; // Miyazaki
+
+        var event = new Event('change', { bubbles: true });
+        directorElement.dispatchEvent(event);
+
+
+
+
+
     }
 
     d3.select("#director").on("change", function () {
         //console.log(d3.select(this));
-        var directorId = d3.select(this).property("value");
+        //console.log(this);
+        var directorId, movies;
+        try{
+            directorId = d3.select(this).property("value");
+            //movies = directorMovies.get(directorId);
+        } catch(error){
+            directorId = "nm0594503";  // Miyazaki
+        }
+
+        //console.log(directorId);
 
         var movies = directorMovies.get(directorId);
 
-        console.log(movies);
+        //console.log(movies);
         drawDirectorMovies(movies);
 
 
@@ -183,7 +206,8 @@
                 div.transition()
                     .duration(200)
                     .style("opacity", .9);
-                div.text(d.primaryTitle + " (" + d.startYear + ")") // state name mouseover
+                var text = d.primaryTitle + " (" + d.startYear + ")" + "<br>Votes: " + d.numVotes + "<br>Rating: " + d.averageRating;
+                div.html(text) // state name mouseover
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
             }).on("mouseout", function () {
@@ -350,11 +374,12 @@
             .attr("r", 2.5)
             .attr("fill", "blue")
             .on("mouseover", function (d) {
-                console.log("Age: " + d.age);
-                console.log("Number of Movies Directed: " + d.noMovies);
+                //console.log("Age: " + d.age);
+                //console.log("Number of Movies Directed: " + d.noMovies);
             });
 
         circles.exit().remove();
+
 
         sg.append("text")
             .attr("x", aSvgWidth / 2)

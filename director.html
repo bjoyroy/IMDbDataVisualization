@@ -22,22 +22,23 @@
 
         div.tooltip {
             position: absolute;
-            text-align: center;
-            width: 100px;
+            text-align: left;
+            width: 200px;
             height: 100px;
             padding: 2px;
-            font: 12px sans-serif;
+            font: 16px sans-serif;
             color: black;
-            background: white;
+            background: lightgreen;
             border: 0px;
             border-radius: 8px;
             pointer-events: none;
+            margin: auto;
         }
     </style>
     <title>Director</title>
 </head>
 <body>
-<h1 class="display-2 text-center">Director, Age, and Their Work</h1>
+<h1 class="display-4 text-center">Director, Age, and Their Work</h1>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.html">IMDb Data Visualization</a>
@@ -62,40 +63,26 @@
         </div>
     </div>
 </nav>
+
+<div class="outer">
+    <form>
+        <label for="director"><strong>Kindly type in a DIRECTOR'S NAME/IMDB person's unique identifier  (it would auto-suggest):</strong></label>
+        <input type="text" name="director" id="director" list="director_list">
+        <datalist id="director_list">
+        </datalist>
+    </form>
+</div>
+
+<div class="outer">
+    <div id="director_movies"></div>
+</div>
+
+
 <div class="grid-container">
     <div id="director_age"></div>
     <div id="director_top_age"></div>
 </div>
 <hr>
-<div class="outer">
-    <form>
-    <label for="director">Kindly type in a director's name (it would auto-suggest):</label>
-    <input type="text" name="director" id="director" list="director_list">
-    <datalist id="director_list">
-        <option value="nm0594503">Hayao Miyazaki</option>
-        <option value="nm0001392">Peter Jackson</option>
-        <option value="nm0006249">Satyajit Ray</option>
-        <option value="nm0000229">Steven Spielberg</option>
-        <option value="nm0005222">Sam Mendes</option>
-        <option value="nm0634240">Christopher Nolan</option>
-    </datalist>
-    </form>
-    <!--
-<select name="director" id="director">
-    <option value=""></option>
-    <option value="nm0594503">Hayao Miyazaki</option>
-    <option value="nm0001392">Peter Jackson</option>
-    <option value="nm0006249">Satyajit Ray</option>
-    <option value="nm0000229">Steven Spielberg</option>
-    <option value="nm0005222">Sam Mendes</option>
-    <option value="nm0634240">Christopher Nolan</option>
-</select>
--->
-</div>
-<h1>Director's Movies and Age</h1>
-<div class="outer">
-    <div id="director_movies"></div>
-</div>
 
 <div class="tooltip"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
