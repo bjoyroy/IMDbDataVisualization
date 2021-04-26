@@ -8,8 +8,8 @@
     var movieRatingBarHeight = 25;
 
     // design specific global variables
-    var width = 1200
-    var height = 3000
+    var width = 1300 // width of dendrogram + barchart
+    var height = 3000 // height of dendrogram + barchart
     var nodeRadius = 3;
 
     var margin = {
@@ -18,7 +18,7 @@
         right: 10,
         bottom: 50
     };
-    var bWidth = 1000, bHeight = 1000;
+    var bWidth = 600, bHeight = 1000; // dimension of barchart
 
     // svg global variables
     var dsvg, dg, votesDiv;
@@ -100,7 +100,6 @@
             .append("svg")
             .attr("width", bWidth)
             .attr("height", bHeight)
-            //.attr("viewBox", [0, 0, 400, 500])
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -109,7 +108,7 @@
             .attr("transform", "translate(25,0)");
 
         xScale = d3.scaleLinear()
-            .domain([0, 50])
+            .domain([0, 60])
             .range([0, bWidth - margin.right]);
 
 
@@ -218,7 +217,7 @@
 
 
         var cluster = d3.cluster()
-            .size([height, width - 500]);  // 500 is the margin I will have on the right side
+            .size([height, width - 700]);  // 600 is the margin I will have on the right side
 
         // Give the data to this cluster layout:
         var root = d3.hierarchy(dendogramData, function(d) {
@@ -284,7 +283,7 @@
 
         var xScale =  d3.scaleLinear()
             .domain([2.5, 10.0])
-            .range([0, 450]);
+            .range([0, 700]);
 
         var xAxis = d3.axisTop()
             .scale(xScale)
