@@ -63,12 +63,18 @@
             .attrTween("stroke-dasharray", tweenDash)
             .on("start", (d) => {
                 //console.log("start");
+                //console.log("hello, world!");
+                d3.selectAll(".checkbox-genre").property("disabled", true);
+                d3.selectAll(".input-src").property("disabled", true);
+
             })
             .on("end", (d) => {
                 //console.log(d);
                 drawEndTextCircle(d);
                 //console.log("end");
                 //d3.select(this).call(transition);
+                d3.selectAll(".checkbox-genre").property("disabled", false);
+                d3.selectAll(".input-src").property("disabled", false);
             });
     }
 
@@ -104,38 +110,6 @@
                 return yScale(d.values[d.values.length - 1]) - 10;
             });
 
-
-
-
-        /*
-        var genre = data.name;
-        var rank = data.values[data.values.length - 1];
-        var cx = xScale(endYear);
-        var cy = yScale(rank);
-        var color = colorFunc(data.index);
-
-        console.log(cx);
-        console.log(cy);
-
-
-
-        pathg.append("circle")
-            .attr("class", "end-circle")
-            .attr("cx", cx)
-            .attr("cy", cy)
-            .attr("r", 5)
-            .attr("fill", color);
-
-        pathg.append("text")
-            .attr("class", "end-text")
-            .text(genre)
-            .attr("dy", "1em")
-            .attr("x", cx + 10)
-            .attr("y", cy - 10);
-
-        */
-
-        //console.log(data);
     }
 
 
@@ -172,7 +146,7 @@
 
             var uniqueMovieNumberSet = new Set();
             var movieNumbers = [];
-            console.log(moviesByGenre);
+            //console.log(moviesByGenre);
 
             genresForAnimation.forEach(function (d) {
 
@@ -358,10 +332,11 @@
 
     function setupLegend(data) {
         var legendRects = data.series.length;
-        var legendWidth = 110;
-        var legendHeight = (rectDimension + rectSpacing) * legendRects + 50;
         var rectDimension = 30;
+        var legendWidth = 110;
         var rectSpacing = 5;
+        var legendHeight = (rectDimension + rectSpacing) * legendRects + 50;
+
 
 
         legendG.html("");

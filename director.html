@@ -20,25 +20,14 @@
             margin-left: 50px;
         }
 
-        div.tooltip {
-            position: absolute;
-            text-align: left;
-            width: 200px;
-            height: 100px;
-            padding: 2px;
-            font: 16px sans-serif;
-            color: black;
-            background: lightgreen;
-            border: 0px;
-            border-radius: 8px;
-            pointer-events: none;
-            margin: auto;
-        }
+
     </style>
+
+
     <title>Director</title>
 </head>
 <body>
-<h1 class="display-4 text-center">Director, Age, and Their Work</h1>
+<h1 class="display-5 text-center">Director, Age, and Their Work</h1>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.html">IMDb Data Visualization</a>
@@ -51,7 +40,7 @@
                     <a class="nav-link" aria-current="page" href="index.html">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="genrePopularity.html">Movie Genre Popularity</a>
+                    <a class="nav-link" href="genrepopularity.html">Movie Genre Popularity</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active active-page" href="director.html">Director</a>
@@ -66,7 +55,7 @@
 
 <div class="outer">
     <form>
-        <label for="director"><strong>Kindly type in a DIRECTOR'S NAME/IMDB person's unique identifier  (it would auto-suggest):</strong></label>
+        <label for="director"><strong>Kindly type in a <u>DIRECTOR'S NAME</u>/IMDB person's unique identifier  (it would auto-suggest):</strong></label>
         <input type="text" name="director" id="director" list="director_list">
         <datalist id="director_list">
         </datalist>

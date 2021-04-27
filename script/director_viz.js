@@ -201,7 +201,9 @@
             .attr("r", function (d) {
                 return voteScale(Math.sqrt(+(d.numVotes)));
             })
-            .attr("fill", "blue")
+            .attr("fill", "#CE1246")
+            .attr("stroke", "blue")
+            .attr("stroke-width", "1.5px")
             .on("mouseover", function (d) {
                 div.transition()
                     .duration(200)
@@ -233,8 +235,8 @@
 
         sg.append("text")
             .attr("x", 2 * aSvgWidth - 100)
-            .attr("y", 30)
-            .attr("dy", "1em")
+            .attr("y", 50)
+            .attr("dy", "5em")
             .text(ageMovies[0].primaryName)
             .attr("font-weight", "bold");
 
@@ -292,11 +294,11 @@
             .attr("cy", function (d) {
                 return yScale(d.noMovies)
             })
-            .attr("r", 2.5)
-            .attr("fill", "blue")
+            .attr("r", 3)
+            .attr("fill", "#CE1246")
             .on("mouseover", function (d) {
-                console.log("Age: " + d.age);
-                console.log("Number of Movies Directed: " + d.noMovies);
+                //console.log("Age: " + d.age);
+                //console.log("Number of Movies Directed: " + d.noMovies);
             });
 
         circles.exit().remove();
@@ -371,8 +373,8 @@
             .attr("cy", function (d) {
                 return yScale(d.noMovies)
             })
-            .attr("r", 2.5)
-            .attr("fill", "blue")
+            .attr("r", 3)
+            .attr("fill", "#CE1246")
             .on("mouseover", function (d) {
                 //console.log("Age: " + d.age);
                 //console.log("Number of Movies Directed: " + d.noMovies);

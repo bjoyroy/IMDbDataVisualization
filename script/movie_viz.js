@@ -45,8 +45,6 @@
     d3.select("#yearSlider")
         .on("change", function () {
             year = +(d3.select(this).property('value'));
-            //numberOfVotes = +(d3.select(this).property('value'));
-            //console.log(year);
 
             d3.select("#yearText").text(year);
 
@@ -180,9 +178,6 @@
             }, minVote);
 
 
-
-
-            //console.log(movies.slice(0, 10));
             var obj = {
                 "name" : genre,
                 "children": topMovies.map(function (m) {
@@ -205,8 +200,6 @@
         var mostVoteColorScale = d3.scaleSequential(d3.interpolateYlGn)
             .domain([minVote, maxVote]);
 
-
-        //console.log(mostVotedMovie);
 
         var dendogramData = {
             "name": year,
@@ -271,8 +264,6 @@
 
         circle.exit().remove();
 
-        //console.log(circle);
-
 
         // Setup G for every leaf datum.
         dg.selectAll(".node--leaf").selectAll("dg.node--leaf-g").remove();
@@ -283,7 +274,7 @@
             .attr("transform", "translate(" + 8 + "," + -10 + ")");
 
         var xScale =  d3.scaleLinear()
-            .domain([2.5, 10.0])
+            .domain([2, 10.5])
             .range([0, dHistrogramWidth]);
 
         var xAxis = d3.axisTop()
@@ -396,7 +387,7 @@
     }
 
     function displayBarChart(info) {
-        console.log(info);
+        //console.log(info);
 
         bg.selectAll(".b-rect")
             .data(info)
@@ -436,12 +427,6 @@
 
                 return "";
             });
-
-
-
-
-
-
 
     }
     
