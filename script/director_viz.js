@@ -146,7 +146,7 @@
 
         var ageRange = d3.extent(ageMovies.map(m => m.age));
 
-        console.log(ageRange);
+        //console.log(ageRange);
 
         var xScale = d3.scaleLinear()
             .domain([ageRange[0] - 1, ageRange[1] + 1])

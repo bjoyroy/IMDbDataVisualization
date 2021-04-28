@@ -510,7 +510,7 @@
     // create continuous color legend
     function continuous(selector_id, colorscale) {
         var legendheight = 400,
-            legendwidth = 80,
+            legendwidth = 100,
             margin = {top: 10, right: 60, bottom: 10, left: 2};
 
         var canvas = d3.select(selector_id)
@@ -574,7 +574,7 @@
             .call(legendaxis);
 
         legendSvg.append("g")
-            .attr("transform", "translate(70, 200)")
+            .attr("transform", "translate(90, 200)")
             .append("text")
             .text("# of Votes")
             .attr("dy", "1em")
